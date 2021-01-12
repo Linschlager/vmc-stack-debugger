@@ -1,23 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { applyMiddleware, createStore } from "redux";
+import { createStore } from "redux";
 
 import App from "./App";
-import vmReducer from "./vmReducer";
+import vm, { initialState } from "./vm/vm";
 
-const logger = (store) => (next) => (action) => {
-  console.log("dispatching", action);
-  let result = next(action);
-  console.log("next state", store.getState());
-  return result;
-};
-
-const store = createStore(
-  vmReducer,
-  { pc: 0, sp: 0, fp: 0, ep: 0, store: {} }
-  // applyMiddleware(logger)
-);
+const store = createStore(vm, initialState);
 
 const WrappedApp = () => {
   return (

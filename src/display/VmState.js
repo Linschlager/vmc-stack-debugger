@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   ADD_INT,
@@ -25,14 +25,15 @@ import {
   STORE,
   STORE_REV,
   SUB_INT
-} from "./vmReducer.consts";
+} from "../vm/instructions";
 
 const VmState = ({ program }) => {
-  const ep = useSelector((state) => state.ep);
+  // const ep = useSelector((state) => state.ep);
   const sp = useSelector((state) => state.sp);
   const pc = useSelector((state) => state.pc);
   const fp = useSelector((state) => state.fp);
   const store = useSelector((state) => state.store);
+  const out = useSelector((state) => state.output);
   const [affectedCells, setAffectedCells] = useState([]);
   const [lastAffected, setLastAffected] = useState([[], []]);
 
@@ -87,13 +88,13 @@ const VmState = ({ program }) => {
   }, [affectedCells]);
 
   const renderStackRows = () => {
-    const storeSize = Math.max(...Object.keys(store).map((k) => +k));
-    const length = Math.max(sp, fp, storeSize, 10);
+    const length = Math.max(sp, 10);
 
     const rows = [];
     for (let i = length + 1; i >= 0; i--) {
       let p = [];
-      if (ep === i) {
+      if (false) {
+        // TODO if extreme pointer is enabled
         p.push(
           <span
             key="ep"
@@ -148,27 +149,6 @@ const VmState = ({ program }) => {
     return rows;
   };
 
-  const renderProgramRows = () => {
-    return program.map((action, i) => {
-      return (
-        <tr key={i}>
-          <td>
-            <span
-              style={{
-                backgroundColor: pc === i ? "green" : "gray",
-                color: "white",
-                padding: 4
-              }}
-            >
-              {i}
-            </span>
-          </td>
-          <td>{action.input}</td>
-        </tr>
-      );
-    });
-  };
-
   return (
     <>
       <h1>State of the VM</h1>
@@ -182,23 +162,12 @@ const VmState = ({ program }) => {
           </thead>
           <tbody>{renderStackRows()}</tbody>
         </table>
-        <table
-          style={{
-            border: "1px solid black",
-            position: "absolute",
-            right: 10,
-            top: 10,
-            zIndex: -1
-          }}
-        >
-          <thead>
-            <tr>
-              <th>Counter</th>
-              <th>Command</th>
-            </tr>
-          </thead>
-          <tbody>{renderProgramRows()}</tbody>
-        </table>
+        {out.length > 0 && <h3>Console Output</h3>}
+        <ul>
+          {out.map((line, i) => (
+            <li key={i}>{line}</li>
+          ))}
+        </ul>
       </div>
     </>
   );

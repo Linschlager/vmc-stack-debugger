@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { INPUT_INT } from "./vmReducer.consts";
+import { CLEAR, INPUT_INT } from "../vm/instructions";
 
 const VmRuntime = ({ program }) => {
   const pc = useSelector((state) => state.pc);
@@ -25,15 +25,21 @@ const VmRuntime = ({ program }) => {
   };
   return (
     <>
-      <button disabled={program?.length === 0} onClick={doAction}>
-        Execute {program[pc]?.type || "[]"}
-      </button>
-      {program[pc]?.type === INPUT_INT && (
-        <input
-          type="number"
-          onChange={(e) => setArg(e.target.value)}
-          value={arg}
-        />
+      {pc === -1 ? (
+        <button onClick={(_) => dispatch({ type: CLEAR })}>Restart</button>
+      ) : (
+        <>
+          <button disabled={program?.length === 0} onClick={doAction}>
+            Execute {program[pc]?.type || "[]"}
+          </button>
+          {program[pc]?.type === INPUT_INT && (
+            <input
+              type="number"
+              onChange={(e) => setArg(e.target.value)}
+              value={arg}
+            />
+          )}
+        </>
       )}
     </>
   );

@@ -1,3 +1,5 @@
+export const CLEAR = "CLEAR";
+
 export const STOP = "STOP";
 export const DUP = "DUP";
 export const ALLOC_BLOCK = "ALLOC_BLOCK";
@@ -58,9 +60,9 @@ export const mapToAction = (input, paramOpt = 64) => {
       return { input, type: SUB_INT };
     case "MultInt":
       return { input, type: MULT_INT };
-    case "DivTInt":
+    case "DivTruncInt":
       return { input, type: DIV_T_INT };
-    case "ModTInt":
+    case "ModTruncInt":
       return { input, type: MOD_T_INT };
     case "EqInt":
       return { input, type: EQ_INT };

@@ -2,6 +2,7 @@ import {
   ADD_INT,
   ALLOC_BLOCK,
   CALL,
+  CLEAR,
   COND_JUMP,
   DEREF,
   DIV_T_INT,
@@ -27,11 +28,21 @@ import {
   STORE_REV,
   SUB_INT,
   UNCOND_JUMP
-} from "./vmReducer.consts";
+} from "./instructions";
 
-const vmReducer = (state, action) => {
-  const { ep, sp, fp, pc, store } = state;
+export const initialState = {
+  sp: 0,
+  pc: 0,
+  fp: 0,
+  ep: 0,
+  store: {},
+  output: []
+};
+export default (state, action) => {
+  const { ep, sp, fp, pc, store, output } = state;
   switch (action.type) {
+    case CLEAR:
+      return initialState;
     case STOP:
       return {
         ...state,
@@ -300,18 +311,18 @@ const vmReducer = (state, action) => {
       return {
         ...state,
         pc: pc + 1,
-        sp: sp - 1
+        sp: sp - 1,
+        output: [...output, store[sp - 1] !== 0]
       };
     case OUTPUT_INT:
       console.log(store[sp - 1]);
       return {
         ...state,
         pc: pc + 1,
-        sp: sp - 1
+        sp: sp - 1,
+        output: [...output, store[sp - 1]]
       };
     default:
       return state;
   }
 };
-
-export default vmReducer;
