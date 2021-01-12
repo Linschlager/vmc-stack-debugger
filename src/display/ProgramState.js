@@ -29,8 +29,7 @@ const ProgramState = ({ program }) => {
     <table
       style={{
         border: "1px solid black",
-        position: "relative",
-        zIndex: -1
+        position: "relative"
       }}
     >
       <thead>
