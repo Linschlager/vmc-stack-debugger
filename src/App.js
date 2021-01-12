@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { copyRecordsHack, copyRecordsRev } from "./programs";
 import ProgramState from "./display/ProgramState";
 import { CLEAR, mapToAction } from "./vm/instructions";
@@ -6,7 +7,6 @@ import VmRuntime from "./display/VmRuntime";
 import VmState from "./display/VmState";
 
 import "./styles.css";
-import { useDispatch } from "react-redux";
 
 export default function App() {
   const [program, setProgram] = useState([]);
@@ -29,9 +29,19 @@ export default function App() {
     <div style={{ display: "flex" }}>
       <div style={{ flexGrow: 1 }}>
         <textarea
+          style={{ display: "flex", width: "90%", resize: "vertical" }}
+          cols={15}
           value={tempActions}
           onChange={(e) => setTempActions(e.target.value)}
         ></textarea>
+        <button
+          onClick={(_) => {
+            setTempActions("");
+            setProgram([]);
+          }}
+        >
+          &times;
+        </button>
         <button onClick={(_) => setTempActions(copyRecordsHack)}>
           Load #1 (Hack)
         </button>
