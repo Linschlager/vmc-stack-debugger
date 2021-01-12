@@ -1,5 +1,31 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import {
+  ADD_INT,
+  CALL,
+  DEREF,
+  DIV_T_INT,
+  DUP,
+  EQ_INT,
+  GE_INT,
+  GT_INT,
+  INPUT_BOOL,
+  INPUT_INT,
+  LE_INT,
+  LOAD_ADDR_REL,
+  LOAD_IM_INT,
+  LT_INT,
+  MOD_T_INT,
+  MULT_INT,
+  NEG_INT,
+  NE_INT,
+  OUTPUT_BOOL,
+  OUTPUT_INT,
+  RETURN,
+  STORE,
+  STORE_REV,
+  SUB_INT
+} from "./vmReducer.consts";
 
 const VmState = ({ program }) => {
   const ep = useSelector((state) => state.ep);
@@ -7,6 +33,58 @@ const VmState = ({ program }) => {
   const pc = useSelector((state) => state.pc);
   const fp = useSelector((state) => state.fp);
   const store = useSelector((state) => state.store);
+  const [affectedCells, setAffectedCells] = useState([]);
+  const [lastAffected, setLastAffected] = useState([[], []]);
+
+  useEffect(() => {
+    const getAffectedCells = () => {
+      const nextAction = program[pc];
+      switch (nextAction?.type) {
+        case DUP:
+          return [sp, sp - 1];
+        case CALL:
+          return [sp, sp + 1, sp + 2];
+        case RETURN:
+          return [fp + 2, fp + 1, fp];
+        case LOAD_IM_INT:
+        case LOAD_ADDR_REL:
+          return [sp];
+        case DEREF:
+          return [sp - 1, store[sp - 1]];
+        case STORE:
+          return [sp - 2, sp - 1, store[sp - 2]];
+        case STORE_REV:
+          return [sp - 2, sp - 1, store[sp - 1]];
+        case NEG_INT:
+        case ADD_INT:
+        case SUB_INT:
+          return [sp - 1];
+        case MULT_INT:
+        case DIV_T_INT:
+        case MOD_T_INT:
+        case EQ_INT:
+        case NE_INT:
+        case GT_INT:
+        case LT_INT:
+        case GE_INT:
+        case LE_INT:
+          return [sp - 1, sp - 2];
+        case INPUT_BOOL:
+        case INPUT_INT:
+          return [store[sp - 1]];
+        case OUTPUT_BOOL:
+        case OUTPUT_INT:
+          return [sp - 1];
+        default:
+          return [];
+      }
+    };
+    setAffectedCells(getAffectedCells());
+  }, [program, store, sp, fp, pc]);
+
+  useEffect(() => {
+    setLastAffected((prev) => [prev[1], affectedCells]);
+  }, [affectedCells]);
 
   const renderStackRows = () => {
     const storeSize = Math.max(...Object.keys(store).map((k) => +k));
@@ -48,8 +126,19 @@ const VmState = ({ program }) => {
           </span>
         );
       }
+      const isAffected = affectedCells.includes(i);
+      const hasBeenAffected = lastAffected[0].includes(i);
       const row = (
-        <tr key={i} style={{ backgroundColor: "darkgray" }}>
+        <tr
+          key={i}
+          style={{
+            backgroundColor: isAffected
+              ? "lightgreen"
+              : hasBeenAffected
+              ? "#ccc"
+              : "#ddd"
+          }}
+        >
           <td>{p}</td>
           <td>{store[i] ?? "‎‎‏‏‎ ‎"}</td>
         </tr>

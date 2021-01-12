@@ -111,7 +111,7 @@ const vmReducer = (state, action) => {
     case STORE:
       const store_newStore = {
         ...store,
-        [store[store[sp - 2]]]: store[sp - 1]
+        [store[sp - 2]]: store[sp - 1]
       };
       return {
         ...state,
